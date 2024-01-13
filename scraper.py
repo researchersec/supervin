@@ -23,7 +23,7 @@ def scrape_website(url):
 
     SCROLL_PAUSE_TIME = 3  # Increase pause time
     PRODUCT_HEIGHT = 300  # Adjust this value if needed
-    num_scrolls = 2500  # Arbitrarily set a high number for num_scrolls to ensure reaching the end
+    num_scrolls = 3500  # Arbitrarily set a high number for num_scrolls to ensure reaching the end
 
     for _ in range(num_scrolls):
         driver.execute_script(f"window.scrollBy(0, {PRODUCT_HEIGHT});")
