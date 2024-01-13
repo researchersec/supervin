@@ -1,0 +1,39 @@
+name: Install Chromium, Chromium-driver, and Selenium
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install-packages:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Update apt-get and install Chromium & Chromium-driver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser chromium-chromedriver
+        
+    - name: Install Selenium
+      run: |
+        pip install selenium
+
+    - name: Install BS4
+      run: |
+        pip install beautifulsoup4
+        
+    - name: Download Chromedriver
+      run: |
+        wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+
+    - name: Run scraper.py
+      run: |
+        python scraper.py
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add wine_data.db
+        git commit -m "updated wine_data.db"
+        git push origin main
