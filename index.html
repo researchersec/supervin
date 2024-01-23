@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Browser</title>
+</head>
+<body>
+    <table id="data-table" border="1">
+        <tr id="header-row"></tr>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchData('your_table_name');
+        });
+
+        function fetchData(tableName) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    displayData(data);
+                }
+            };
+
+            // Assuming your server provides a REST API endpoint to fetch data
+            xhr.open("GET", "https://your-api-endpoint.com/" + tableName, true);
+            xhr.send();
+        }
+
+        function displayData(data) {
+            var table = document.getElementById("data-table");
+            var headerRow = document.getElementById("header-row");
+
+            // Create table headers
+            for (var header in data[0]) {
+                var th = document.createElement("th");
+                th.appendChild(document.createTextNode(header));
+                headerRow.appendChild(th);
+            }
+
+            // Create table rows
+            for (var i = 0; i < data.length; i++) {
+                var row = table.insertRow(-1);
+                for (var key in data[i]) {
+                    var cell = row.insertCell(-1);
+                    cell.appendChild(document.createTextNode(data[i][key]));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
