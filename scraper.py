@@ -70,9 +70,6 @@ def create_or_connect_database():
     return cursor, conn
 
 def update_or_insert_data(cursor, conn, articles):
-    # Dictionary to store previous price information
-    previous_prices = {}
-
     for article in articles:
         wine_name = article.find('h4').text.strip() if article.find('h4') else None
         prices = article.find_all('span', class_='price')
@@ -82,26 +79,29 @@ def update_or_insert_data(cursor, conn, articles):
             wine_price_1 = prices[0].text.strip().replace('DKK', '').strip()
             wine_price_6 = prices[1].text.strip().replace('DKK', '').strip()
 
-            # Check if wine_name already exists in the names table
-            cursor.execute('SELECT id FROM names WHERE name = ?', (wine_name,))
-            existing_name = cursor.fetchone()
+            # Check if wine_name already exists in the prices table
+            cursor.execute('SELECT id, price_1, price_6 FROM prices INNER JOIN names ON prices.name_id = names.id WHERE names.name = ?', (wine_name,))
+            existing_prices = cursor.fetchone()
 
-            if existing_name:
-                name_id = existing_name[0]  # Use existing name_id
+            if existing_prices:
+                # Compare with existing prices and update if changed
+                if (existing_prices[1] != wine_price_1 or existing_prices[2] != wine_price_6):
+                    cursor.execute('UPDATE prices SET price_1=?, price_6=? WHERE id=?', (wine_price_1, wine_price_6, existing_prices[0]))
             else:
-                # Insert into names table if not found
-                cursor.execute('INSERT INTO names (name, wine_link) VALUES (?, ?)', (wine_name, wine_link))
-                name_id = cursor.lastrowid  # Get the last inserted row id (name_id)
-
-            # Check if prices are different from the previous scrape
-            if name_id in previous_prices and (previous_prices[name_id]['price_1'] != wine_price_1 or
-                                               previous_prices[name_id]['price_6'] != wine_price_6):
                 # Insert into prices table with foreign key reference
-                cursor.execute('INSERT INTO prices (price_1, price_6, name_id) VALUES (?, ?, ?)',
-                               (wine_price_1, wine_price_6, name_id))
+                # First, check if the wine exists in the names table
+                cursor.execute('SELECT id FROM names WHERE name = ?', (wine_name,))
+                existing_name = cursor.fetchone()
 
-            # Update previous prices with the current prices
-            previous_prices[name_id] = {'price_1': wine_price_1, 'price_6': wine_price_6}
+                if existing_name:
+                    name_id = existing_name[0]  # Use existing name_id
+                else:
+                    # Insert into names table if not found
+                    cursor.execute('INSERT INTO names (name, wine_link) VALUES (?, ?)', (wine_name, wine_link))
+                    name_id = cursor.lastrowid  # Get the last inserted row id (name_id)
+
+                # Insert into prices table with foreign key reference
+                cursor.execute('INSERT INTO prices (price_1, price_6, name_id) VALUES (?, ?, ?)', (wine_price_1, wine_price_6, name_id))
 
             # Insert into reviews table with foreign key reference
             cursor.execute('INSERT INTO reviews (review, name_id) VALUES (?, ?)', ('', name_id))
