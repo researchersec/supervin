@@ -80,7 +80,7 @@ def update_or_insert_data(cursor, conn, articles):
             wine_price_6 = prices[1].text.strip().replace('DKK', '').strip()
 
             # Check if wine_name already exists in the prices table
-            cursor.execute('SELECT id, price_1, price_6 FROM prices INNER JOIN names ON prices.name_id = names.id WHERE names.name = ?', (wine_name,))
+            cursor.execute('SELECT prices.id, price_1, price_6 FROM prices INNER JOIN names ON prices.name_id = names.id WHERE names.name = ?', (wine_name,))
             existing_prices = cursor.fetchone()
 
             if existing_prices:
