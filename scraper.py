@@ -75,6 +75,8 @@ def update_or_insert_data(cursor, conn, articles):
         prices = article.find_all('span', class_='price')
         wine_link = article.find('a')['href'].strip() if article.find('a') and 'href' in article.find('a').attrs else None
 
+        name_id = None  # Initialize name_id outside the conditional blocks
+
         if len(prices) >= 2:
             wine_price_1 = prices[0].text.strip().replace('DKK', '').strip()
             wine_price_6 = prices[1].text.strip().replace('DKK', '').strip()
@@ -87,6 +89,7 @@ def update_or_insert_data(cursor, conn, articles):
                 # Compare with existing prices and update if changed
                 if (existing_prices[1] != wine_price_1 or existing_prices[2] != wine_price_6):
                     cursor.execute('UPDATE prices SET price_1=?, price_6=? WHERE id=?', (wine_price_1, wine_price_6, existing_prices[0]))
+                name_id = existing_prices[0]  # Assign name_id in this case
             else:
                 # Insert into prices table with foreign key reference
                 # First, check if the wine exists in the names table
@@ -108,6 +111,7 @@ def update_or_insert_data(cursor, conn, articles):
 
     conn.commit()
     conn.close()
+
 
 def main():
     url = "https://www.supervin.dk/vin/rodvin?Products%5BrefinementList%5D%5Bfacet_types%5D%5B0%5D=R%C3%B8dvin"
