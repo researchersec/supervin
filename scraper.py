@@ -88,7 +88,8 @@ def update_or_insert_data(cursor, conn, articles):
             if existing_prices:
                 # Compare with existing prices and update if changed
                 if (existing_prices[1] != wine_price_1 or existing_prices[2] != wine_price_6):
-                    cursor.execute('UPDATE prices SET price_1=?, price_6=? WHERE id=?', (wine_price_1, wine_price_6, existing_prices[0]))
+                    # Insert a new row with the updated prices
+                    cursor.execute('INSERT INTO prices (price_1, price_6, name_id) VALUES (?, ?, ?)', (wine_price_1, wine_price_6, existing_prices[0]))
                 name_id = existing_prices[0]  # Assign name_id in this case
             else:
                 # Insert into prices table with foreign key reference
