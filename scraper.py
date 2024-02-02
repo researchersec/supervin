@@ -36,7 +36,7 @@ def scrape_website(url):
     return articles
 
 def create_or_connect_database():
-    conn = sqlite3.connect('wine_data.db')
+    conn = sqlite3.connect('supervin.db')
     cursor = conn.cursor()
 
     cursor.execute('''
