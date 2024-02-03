@@ -38,6 +38,6 @@ jobs:
         python scraper.py
         git config --global user.email "github-actions@github.com"
         git config --global user.name "GitHub Actions"
-        git add wine_data.db
-        git commit -m "updated wine_data.db"
+        git add supervin.db
+        git commit -m "updated supervin.db"
         git push origin main
