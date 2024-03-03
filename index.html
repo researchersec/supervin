@@ -2,30 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Wine List</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Changes</title>
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>Wine List</h1>
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search wines...">
-        <table id="wineTable" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Price (1)</th>
-                    <th>Price (6)</th>
-                    <th>Country</th>
-                    <th>Image</th>
-                </tr>
-            </thead>
-            <tbody id="wineTableBody">
-                <!-- Wine data will be dynamically populated here -->
-            </tbody>
-        </table>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.js"></script>
+    <h1>Price Changes</h1>
+    <table id="priceTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price 1</th>
+                <th>Price 6</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <!-- Table body will be populated dynamically -->
+    </table>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
