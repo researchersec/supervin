@@ -1,39 +1,46 @@
-document.addEventListener('DOMContentLoaded', async function () {
-    const searchInput = document.getElementById('searchInput');
-    const wineTableBody = document.getElementById('wineTableBody');
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('prices.json') // Load data from exported JSON file
+        .then(response => response.json())
+        .then(data => {
+            // Calculate price changes for last week, last month, and last year
+            const currentDate = new Date();
+            const lastWeekDate = new Date(currentDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+            const lastMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
+            const lastYearDate = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDate());
+            
+            data.forEach(entry => {
+                entry.lastWeekChange = calculatePriceChange(entry.price_1, entry.timestamp, lastWeekDate);
+                entry.lastMonthChange = calculatePriceChange(entry.price_1, entry.timestamp, lastMonthDate);
+                entry.lastYearChange = calculatePriceChange(entry.price_1, entry.timestamp, lastYearDate);
+            });
 
-    const response = await fetch('supervin.db');
-    const buffer = await response.arrayBuffer();
-    const SQL = await initSqlJs({ locateFile: () => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.wasm' });
-    const db = new SQL.Database(new Uint8Array(buffer));
-
-    function loadWines() {
-        const query = 'SELECT * FROM wines';
-        const result = db.exec(query);
-        renderTable(result[0].values);
-    }
-
-    function renderTable(data) {
-        wineTableBody.innerHTML = '';
-        data.forEach(wine => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${wine[1]}</td>
-                <td>${wine[2]}</td>
-                <td>${wine[3]}</td>
-                <td>${wine[5]}</td>
-                <td><img src="${wine[4]}" alt="${wine[1]}" style="width: 100px;"></td>
-            `;
-            wineTableBody.appendChild(row);
-        });
-    }
-
-    loadWines();
-
-    searchInput.addEventListener('input', function () {
-        const searchValue = this.value.toLowerCase();
-        const query = `SELECT * FROM wines WHERE name LIKE '%${searchValue}%' OR country LIKE '%${searchValue}%'`;
-        const result = db.exec(query);
-        renderTable(result[0].values);
-    });
+            const table = $('#priceTable').DataTable({
+                data: data,
+                columns: [
+                    { title: "Name" },
+                    { title: "Price 1" },
+                    { title: "Price 6" },
+                    { title: "Timestamp" },
+                    { title: "Last Week Change" },
+                    { title: "Last Month Change" },
+                    { title: "Last Year Change" }
+                ]
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
 });
+
+// Function to calculate price change
+function calculatePriceChange(currentPrice, timestamp, comparisonDate) {
+    // Convert timestamp to Date object
+    const entryDate = new Date(timestamp);
+
+    // Check if the entry date is within the comparison period
+    if (entryDate >= comparisonDate) {
+        return "N/A"; // No change if within the comparison period
+    } else {
+        // Calculate price change percentage
+        const changePercentage = ((currentPrice - entryPrice) / entryPrice) * 100;
+        return `${changePercentage.toFixed(2)}%`;
+    }
+}
